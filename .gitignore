@@ -4,3 +4,4 @@ __pycache__/
 pickleball.db
 test_pickleball.db
 .DS_Store
+.env
