@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Woburn Pickleball Sign-Up | 2 Courts Thursdays 7-9 PM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Top Header -->
+    <header class="hero-header">
+      <div class="hero-badge">
+        <span class="pulse-dot"></span>
+        <span>Woburn Racket Club • 9 Webster St, Woburn, MA</span>
+      </div>
+      <h1 class="hero-title">🎾 Pickleball Crew</h1>
+      <p class="hero-subtitle">Thursdays • 7:00 PM – 9:00 PM • $23 / player</p>
+      
+      <div class="hero-meta-bar">
+        <div class="venmo-recipient-pill" id="venmoRecipientBadge">
+          <svg class="venmo-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19.5 3c.6 1 .9 2.2.9 3.6 0 4.5-3.8 10.3-6.9 14.4h-5.1c2.3-3.6 4.9-8.4 4.9-11.4 0-1.7-.8-2.7-2-2.7-.9 0-1.8.5-2.6 1.4L6.9 5.8C8.3 4 10.2 3 12.3 3c2.7 0 5 1.5 7.2 0z"/>
+          </svg>
+          <span>Pay to <strong>Lori</strong> (<code id="headerVenmoHandle">@LGoodrich401</code>)</span>
+        </div>
+        <div class="hero-actions">
+          <button class="btn btn-venmo-sm" id="openVenmoModalBtn">
+            <span>Pay $23</span>
+          </button>
+          <button class="btn btn-outline-sm" id="shareInviteBtn" title="Copy text invite to clipboard">
+            <span>📋 Share</span>
+          </button>
+          <button class="btn btn-ghost-sm" id="openSettingsBtn" title="Settings">
+            <span>⚙️</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Sign-Up Card (FIRST, DIRECTLY UNDER TITLE SECTION) -->
+    <section class="signup-section">
+      <div class="card signup-card">
+        <div class="card-header">
+          <div>
+            <h3>Sign Up to Play</h3>
+            <p class="card-subtitle">Woburn Racket Club • $23 to Lori via Venmo</p>
+          </div>
+          <span class="badge badge-primary" id="signupSpotBadge">8 Spots Available</span>
+        </div>
+
+        <form id="signupForm" class="signup-form">
+          <div class="form-group">
+            <label for="signupDateSelect">Select Thursday Session *</label>
+            <select id="signupDateSelect" class="form-select" required>
+              <!-- Options populated dynamically -->
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group flex-2">
+              <label for="playerName">Your Name *</label>
+              <input type="text" id="playerName" name="player_name" placeholder="First and Last Name" required autocomplete="name">
+            </div>
+            <div class="form-group flex-1">
+              <label for="playerPhone">Cell / Phone (Optional)</label>
+              <input type="tel" id="playerPhone" name="phone" placeholder="e.g. 555-123-4567" autocomplete="tel">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="playerNotes">Note (Optional)</label>
+            <input type="text" id="playerNotes" name="notes" placeholder="e.g., Bringing extra balls, or running 5 mins late">
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-block" id="submitSignupBtn">
+              <span>Sign Up to Play ($23)</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Compact Thursday Session Selector & Info (Small, further down) -->
+    <section class="compact-session-section" id="sessionCard">
+      <div class="compact-session-header">
+        <div class="compact-session-title-wrap">
+          <span class="compact-session-tag">Thursday Session</span>
+          <h2 class="compact-session-heading" id="currentDateHeading">—</h2>
+          <div class="compact-session-sub" id="currentLocationSub">Woburn Racket Club • 9 Webster St • 2 Courts • 7:00–9:00 PM</div>
+        </div>
+        <div class="compact-session-actions">
+          <button class="btn-text-action" id="addSessionBtn">+ Add Date</button>
+          <button class="btn-text-delete" id="deleteSessionBtn" title="Remove this session date">🗑️ Remove Date</button>
+        </div>
+      </div>
+
+      <!-- Compact Date Carousel -->
+      <div class="dates-carousel compact-dates" id="datesCarousel">
+        <div class="dates-loading">Loading upcoming sessions...</div>
+      </div>
+
+      <!-- Small Live Metrics Bar -->
+      <div class="compact-stats-bar">
+        <span class="compact-stat-item">👥 <strong id="statConfirmed">—</strong> / 8 Confirmed</span>
+        <span class="compact-stat-divider">•</span>
+        <span class="compact-stat-item">🎾 <strong id="statSpotsRemaining" class="highlight-spots">—</strong></span>
+        <span class="compact-stat-divider">•</span>
+        <span class="compact-stat-item">💳 <strong id="statPaidRatio">—</strong></span>
+        <span class="compact-stat-divider">•</span>
+        <span class="compact-stat-item">⏳ <strong id="statWaitlistCaption">Waitlist: 0</strong></span>
+      </div>
+    </section>
+
+    <!-- Confirmed Players Roster (8 Spots across 2 Courts) -->
+    <section class="roster-section">
+      <div class="section-header">
+        <div>
+          <h3>Confirmed Players (<span id="confirmedCount">0</span>/8)</h3>
+          <p class="section-subtitle">2 Courts doubles play • Tap <strong>Paid</strong> badge to update payment status</p>
+        </div>
+        <button class="btn btn-sm btn-ghost" id="copyRosterBtn" title="Copy roster to clipboard for texting">
+          📋 Copy Roster
+        </button>
+      </div>
+
+      <div class="roster-list" id="confirmedList">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- Waitlist Section (Always visible, dedicated space for waitlist) -->
+    <section class="roster-section waitlist-section-always" id="waitlistSection">
+      <div class="section-header">
+        <div>
+          <h3>⏳ Waitlist (<span id="waitlistCount">0</span>)</h3>
+          <p class="section-subtitle">Spots 9+. Automatically advance to Court 1 or 2 if a confirmed player cancels.</p>
+        </div>
+      </div>
+
+      <div class="roster-list" id="waitlistList">
+        <!-- Rendered dynamically with players or open waitlist placeholder spots -->
+      </div>
+    </section>
+
+    <!-- Footer info -->
+    <footer class="app-footer">
+      <p>Woburn Racket Club • 9 Webster St, Woburn, MA 01801 • Thursdays 7:00 PM – 9:00 PM</p>
+      <p class="footer-sub">Organized by Lori • Venmo <a href="javascript:void(0)" id="footerVenmoLink">@LGoodrich401</a></p>
+    </footer>
+
+  </div>
+
+  <!-- Venmo Payment Modal -->
+  <div class="modal-backdrop" id="venmoModal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Venmo Payment</h3>
+        <button class="modal-close" id="closeVenmoModal">&times;</button>
+      </div>
+      <div class="modal-body text-center">
+        <div class="venmo-amount-box">
+          <span class="venmo-currency">$</span>
+          <span class="venmo-large-amt" id="modalVenmoAmount">23</span>
+          <span class="venmo-per">/ person</span>
+        </div>
+        
+        <p class="venmo-instruction">
+          Send payment to <strong>Lori</strong> on Venmo:
+        </p>
+        <div class="venmo-user-pill">
+          <span class="venmo-v-logo">V</span>
+          <strong id="modalVenmoHandle">@LGoodrich401</strong>
+        </div>
+
+        <div class="memo-suggestion">
+          <span class="memo-label">Suggested Memo:</span>
+          <code id="modalVenmoMemo">Pickleball Woburn Racket Club Oct 1</code>
+        </div>
+
+        <!-- QR Code for desktop / tablet scanning -->
+        <div class="qr-container">
+          <canvas id="venmoQrCanvas" width="160" height="160"></canvas>
+          <p class="qr-caption">Scan with your phone camera or Venmo app</p>
+        </div>
+
+        <div class="modal-actions">
+          <a id="modalVenmoDeepLink" href="#" class="btn btn-venmo btn-block" target="_blank" rel="noopener">
+            Open in Venmo App
+          </a>
+          <button class="btn btn-primary btn-block" id="modalMarkPaidBtn" style="display: none;">
+            ✓ I Paid via Venmo (Mark Paid)
+          </button>
+          <button class="btn btn-secondary btn-block" id="copyVenmoHandleBtn">
+            Copy Venmo Handle (@LGoodrich401)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-backdrop" id="settingsModal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Organizer Settings</h3>
+        <button class="modal-close" id="closeSettingsModal">&times;</button>
+      </div>
+      <form id="settingsForm" class="modal-body">
+        <div class="form-group">
+          <label for="setVenmoHandle">Venmo Handle (without @)</label>
+          <input type="text" id="setVenmoHandle" required>
+        </div>
+        <div class="form-group">
+          <label for="setOrganizerName">Organizer Name</label>
+          <input type="text" id="setOrganizerName" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="setCost">Cost Per Player ($)</label>
+            <input type="number" step="0.5" id="setCost" required>
+          </div>
+          <div class="form-group flex-1">
+            <label for="setCourtCount">Number of Courts</label>
+            <input type="number" id="setCourtCount" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="setMaxPlayers">Default Max Players</label>
+            <input type="number" id="setMaxPlayers" min="4" max="20" required>
+          </div>
+          <div class="form-group flex-2">
+            <label for="setTimeSlot">Time Slot</label>
+            <input type="text" id="setTimeSlot" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="setLocation">Location</label>
+          <input type="text" id="setLocation" required>
+        </div>
+        <div class="form-group">
+          <label for="setCloudDbUrl">Shared Live Database URL (Optional)</label>
+          <input type="url" id="setCloudDbUrl" placeholder="e.g. https://your-db-name.firebaseio.com">
+          <small class="form-help-text">Connect a free Firebase Realtime Database or cloud endpoint to sync rosters live between all players' phones.</small>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary btn-block">Save Settings</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Date Modal -->
+  <div class="modal-backdrop" id="addDateModal" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Add New Play Date</h3>
+        <button class="modal-close" id="closeAddDateModal">&times;</button>
+      </div>
+      <form id="addDateForm" class="modal-body">
+        <div class="form-group">
+          <label for="newSessionDate">Date</label>
+          <input type="date" id="newSessionDate" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label for="newSessionTime">Time</label>
+            <input type="text" id="newSessionTime" value="7:00 PM - 9:00 PM" required>
+          </div>
+          <div class="form-group flex-1">
+            <label for="newSessionMax">Max Players</label>
+            <input type="number" id="newSessionMax" value="8" min="4" max="20" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="newSessionNotes">Notes</label>
+          <input type="text" id="newSessionNotes" placeholder="e.g. Woburn Racket Club 2 Courts">
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary btn-block">Add Session Date</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
+
+  <!-- QR Code Generator library (lightweight self-contained) & Application Script -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
