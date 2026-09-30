@@ -1329,7 +1329,11 @@ function handleShareInvite() {
   const handle = state.settings.venmo_handle;
   const spotsLeft = sess.spots_remaining;
 
-  const msg = `🎾 Pickleball at Woburn Racket Club!\n📍 9 Webster St, Woburn, MA 01801\n📅 ${dateStr} from 7:00–9:00 PM (2 Courts)\n💵 $${cost} per person to Lori (Venmo @${handle})\n⚡ ${spotsLeft} spot${spotsLeft === 1 ? "" : "s"} open! Sign up here: ${window.location.origin}`;
+  const siteUrl = window.location.origin && !window.location.origin.includes("localhost") && !window.location.origin.includes("127.0.0.1")
+    ? window.location.origin
+    : "https://picklecrew.netlify.app";
+
+  const msg = `🎾 Pickleball at Woburn Racket Club!\n📍 9 Webster St, Woburn, MA 01801\n📅 ${dateStr} from 7:00–9:00 PM (2 Courts)\n💵 $${cost} per person to Lori (Venmo @${handle})\n⚡ ${spotsLeft} spot${spotsLeft === 1 ? "" : "s"} open! Sign up here: ${siteUrl}`;
 
   copyToClipboard(msg, "Share invite copied to clipboard!");
 }

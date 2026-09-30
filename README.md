@@ -2,6 +2,8 @@
 
 A mobile-friendly, real-time web application to organize weekly pickleball sessions for 8–10 players at **Woburn Racket Club** (9 Webster St, Woburn, MA 01801 • 2 courts, Thursdays 7:00–9:00 PM, $23 per person).
 
+- **Live Site**: [https://picklecrew.netlify.app](https://picklecrew.netlify.app)
+
 ## Features
 
 - **8-Week Thursday Playing Schedule**: 
