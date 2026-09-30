@@ -64,10 +64,64 @@ const shareInviteBtn = document.getElementById("shareInviteBtn");
 const copyRosterBtn = document.getElementById("copyRosterBtn");
 
 // -------------------------------------------------------------
-// Universal Data Manager (Supports Local Server, Cloud DB, Netlify)
+// Supabase Configuration & Universal Data Manager
 // -------------------------------------------------------------
+const SUPABASE_CONFIG = {
+  url: "https://udcsdzholfmwyjddelum.supabase.co",
+  key: "sb_publishable_QrQfmJ75xcfC7RpW0oChCQ_OBVZRP9O"
+};
+
+let supabaseClient = null;
+
+function getSupabase() {
+  if (!supabaseClient && window.supabase && typeof window.supabase.createClient === "function") {
+    try {
+      supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.key);
+    } catch (e) {
+      console.warn("Failed to initialize Supabase client:", e);
+    }
+  }
+  return supabaseClient;
+}
+
 const DataManager = {
   isBackendAvailable: null,
+  isSupabaseConnected: null,
+
+  getDefaultSettings() {
+    return {
+      venmo_handle: "LGoodrich401",
+      organizer_name: "Lori",
+      cost_per_person: "23",
+      location: "Woburn Racket Club, 9 Webster St, Woburn, MA 01801",
+      courts: "2",
+      time_slot: "7:00 PM - 9:00 PM",
+      default_max_players: "8",
+      cloud_db_url: ""
+    };
+  },
+
+  async checkSupabase() {
+    if (this.isSupabaseConnected === true) return true;
+    const sb = getSupabase();
+    if (!sb) {
+      this.isSupabaseConnected = false;
+      return false;
+    }
+    try {
+      const { data, error } = await sb.from("sessions").select("id").limit(1);
+      if (!error) {
+        this.isSupabaseConnected = true;
+        return true;
+      }
+      // If error (e.g. table not created yet), return false so app falls back gracefully
+      console.warn("Supabase query returned error (run supabase_setup.sql in Supabase SQL editor):", error.message || error);
+    } catch (e) {
+      console.warn("Supabase connection check exception:", e);
+    }
+    this.isSupabaseConnected = false;
+    return false;
+  },
 
   async checkBackend() {
     if (this.isBackendAvailable !== null) return this.isBackendAvailable;
@@ -123,16 +177,7 @@ const DataManager = {
       } catch (e) {}
     }
     const initial = {
-      settings: {
-        venmo_handle: "LGoodrich401",
-        organizer_name: "Lori",
-        cost_per_person: "23",
-        location: "Woburn Racket Club, 9 Webster St, Woburn, MA 01801",
-        courts: "2",
-        time_slot: "7:00 PM - 9:00 PM",
-        default_max_players: "8",
-        cloud_db_url: ""
-      },
+      settings: this.getDefaultSettings(),
       nextSignupId: 1,
       nextSessionId: 9,
       sessions: [
@@ -173,6 +218,21 @@ const DataManager = {
   },
 
   async getSettings() {
+    const sb = getSupabase();
+    if (await this.checkSupabase()) {
+      try {
+        const { data, error } = await sb.from("settings").select("*");
+        if (!error && data && data.length > 0) {
+          const map = {};
+          data.forEach(item => {
+            map[item.key] = item.value;
+          });
+          return { ...this.getDefaultSettings(), ...map };
+        }
+      } catch (e) {
+        console.warn("Supabase getSettings error, falling back:", e);
+      }
+    }
     if (await this.checkBackend()) {
       try {
         const res = await fetch("/api/settings");
@@ -184,6 +244,22 @@ const DataManager = {
   },
 
   async updateSettings(newSettings) {
+    const sb = getSupabase();
+    if (await this.checkSupabase()) {
+      try {
+        const rows = Object.entries(newSettings).map(([key, val]) => ({
+          key,
+          value: String(val)
+        }));
+        const { error } = await sb.from("settings").upsert(rows);
+        if (!error) {
+          const updated = await this.getSettings();
+          return { success: true, settings: updated };
+        }
+      } catch (e) {
+        console.warn("Supabase updateSettings error:", e);
+      }
+    }
     if (await this.checkBackend()) {
       try {
         const res = await fetch("/api/settings", {
@@ -201,6 +277,44 @@ const DataManager = {
   },
 
   async getSessions() {
+    const sb = getSupabase();
+    if (await this.checkSupabase()) {
+      try {
+        const { data: sessions, error: sessErr } = await sb
+          .from("sessions")
+          .select("*")
+          .order("session_date", { ascending: true });
+
+        const { data: signups, error: signErr } = await sb
+          .from("signups")
+          .select("id, session_id, paid, created_at")
+          .order("created_at", { ascending: true });
+
+        if (!sessErr && sessions) {
+          const allSignups = signups || [];
+          return sessions.map(s => {
+            const sSignups = allSignups.filter(su => String(su.session_id) === String(s.id));
+            const paidCount = sSignups.filter(su => Number(su.paid) === 1).length;
+            const total = sSignups.length;
+            const max = parseInt(s.max_players, 10) || 8;
+            return {
+              ...s,
+              id: parseInt(s.id, 10),
+              cost_per_person: parseFloat(s.cost_per_person) || 23,
+              max_players: max,
+              total_signups: total,
+              paid_count: paidCount,
+              unpaid_count: total - paidCount,
+              confirmed_count: Math.min(total, max),
+              waitlist_count: Math.max(0, total - max),
+              spots_remaining: Math.max(0, max - total)
+            };
+          });
+        }
+      } catch (e) {
+        console.warn("Supabase getSessions error, falling back:", e);
+      }
+    }
     if (await this.checkBackend()) {
       try {
         const res = await fetch("/api/sessions");
@@ -227,6 +341,70 @@ const DataManager = {
 
   async getSessionById(sessionId) {
     sessionId = parseInt(sessionId, 10);
+    const sb = getSupabase();
+    if (await this.checkSupabase()) {
+      try {
+        const { data: session, error: sessErr } = await sb
+          .from("sessions")
+          .select("*")
+          .eq("id", sessionId)
+          .single();
+
+        const { data: signups, error: signErr } = await sb
+          .from("signups")
+          .select("*")
+          .eq("session_id", sessionId)
+          .order("created_at", { ascending: true })
+          .order("id", { ascending: true });
+
+        if (!sessErr && session) {
+          const max = parseInt(session.max_players, 10) || 8;
+          const cost = parseFloat(session.cost_per_person) || 23;
+          const confirmed = [];
+          const waitlist = [];
+          const allSignups = signups || [];
+
+          allSignups.forEach((s, idx) => {
+            const item = {
+              ...s,
+              id: parseInt(s.id, 10),
+              session_id: parseInt(s.session_id, 10),
+              paid: Number(s.paid) || 0
+            };
+            if (idx < max) {
+              item.roster_spot = idx + 1;
+              item.is_waitlist = false;
+              confirmed.push(item);
+            } else {
+              item.waitlist_spot = (idx - max) + 1;
+              item.is_waitlist = true;
+              waitlist.push(item);
+            }
+          });
+
+          const paidCount = allSignups.filter(s => Number(s.paid) === 1).length;
+
+          return {
+            ...session,
+            id: parseInt(session.id, 10),
+            cost_per_person: cost,
+            max_players: max,
+            confirmed_players: confirmed,
+            waitlist_players: waitlist,
+            total_signups: allSignups.length,
+            confirmed_count: confirmed.length,
+            waitlist_count: waitlist.length,
+            spots_remaining: Math.max(0, max - confirmed.length),
+            paid_count: paidCount,
+            unpaid_count: allSignups.length - paidCount,
+            total_collected: paidCount * cost,
+            expected_total: confirmed.length * cost
+          };
+        }
+      } catch (e) {
+        console.warn("Supabase getSessionById error, falling back:", e);
+      }
+    }
     if (await this.checkBackend()) {
       try {
         const res = await fetch(`/api/sessions/${sessionId}`);
@@ -277,6 +455,50 @@ const DataManager = {
 
   async addSignup(sessionId, playerName, phone, notes) {
     sessionId = parseInt(sessionId, 10);
+    const sb = getSupabase();
+    if (await this.checkSupabase()) {
+      try {
+        // Check for duplicates
+        const { data: existing } = await sb
+          .from("signups")
+          .select("id, player_name")
+          .eq("session_id", sessionId)
+          .ilike("player_name", playerName.trim());
+
+        if (existing && existing.length > 0) {
+          throw new Error(`'${playerName}' is already signed up for this date!`);
+        }
+
+        const { data: inserted, error: insertErr } = await sb
+          .from("signups")
+          .insert([{
+            session_id: sessionId,
+            player_name: playerName.trim(),
+            phone: (phone || "").trim(),
+            notes: (notes || "").trim(),
+            paid: 0,
+            paid_at: null
+          }])
+          .select()
+          .single();
+
+        if (insertErr) throw insertErr;
+
+        const session = await this.getSessionById(sessionId);
+        const isWaitlist = session.waitlist_players.some(p => p.id === inserted.id);
+
+        return {
+          success: true,
+          signup_id: inserted.id,
+          is_waitlist: isWaitlist,
+          session: session
+        };
+      } catch (err) {
+        if (err.message && err.message.includes("already signed up")) throw err;
+        console.warn("Supabase addSignup error, falling back:", err);
+      }
+    }
+
     if (await this.checkBackend()) {
       try {
         const res = await fetch(`/api/sessions/${sessionId}/signup`, {
@@ -288,11 +510,7 @@ const DataManager = {
         if (!res.ok) throw new Error(json.error || "Failed to sign up");
         return json;
       } catch (err) {
-        if (!this.isBackendAvailable) {
-          // fall through to local
-        } else {
-          throw err;
-        }
+        if (this.isBackendAvailable) throw err;
       }
     }
 
@@ -331,6 +549,32 @@ const DataManager = {
 
   async togglePayment(signupId) {
     signupId = parseInt(signupId, 10);
+    const sb = getSupabase();
+    if (await this.checkSupabase()) {
+      try {
+        const { data: cur, error: fetchErr } = await sb
+          .from("signups")
+          .select("paid")
+          .eq("id", signupId)
+          .single();
+
+        if (!fetchErr && cur) {
+          const nextPaid = Number(cur.paid) === 1 ? 0 : 1;
+          const nextPaidAt = nextPaid === 1 ? new Date().toISOString() : null;
+          const { error: updErr } = await sb
+            .from("signups")
+            .update({ paid: nextPaid, paid_at: nextPaidAt })
+            .eq("id", signupId);
+
+          if (!updErr) {
+            return { success: true, signup_id: signupId, paid: nextPaid };
+          }
+        }
+      } catch (e) {
+        console.warn("Supabase togglePayment error, falling back:", e);
+      }
+    }
+
     if (await this.checkBackend()) {
       try {
         const res = await fetch(`/api/signups/${signupId}/payment`, {
@@ -354,6 +598,18 @@ const DataManager = {
 
   async deleteSignup(signupId) {
     signupId = parseInt(signupId, 10);
+    const sb = getSupabase();
+    if (await this.checkSupabase()) {
+      try {
+        const { error } = await sb.from("signups").delete().eq("id", signupId);
+        if (!error) {
+          return { success: true, deleted_id: signupId };
+        }
+      } catch (e) {
+        console.warn("Supabase deleteSignup error, falling back:", e);
+      }
+    }
+
     if (await this.checkBackend()) {
       try {
         const res = await fetch(`/api/signups/${signupId}`, { method: "DELETE" });
@@ -370,6 +626,40 @@ const DataManager = {
   },
 
   async addSession(sessionDate, timeSlot, maxPlayers, notes) {
+    const sb = getSupabase();
+    if (await this.checkSupabase()) {
+      try {
+        const dt = new Date(sessionDate + "T12:00:00");
+        const dayOfWeek = dt.toLocaleDateString("en-US", { weekday: "long" });
+        const settings = await this.getSettings();
+
+        const { data: inserted, error } = await sb
+          .from("sessions")
+          .insert([{
+            session_date: sessionDate,
+            day_of_week: dayOfWeek,
+            time_slot: timeSlot || settings.time_slot || "7:00 PM - 9:00 PM",
+            location: settings.location || "Woburn Racket Club, 9 Webster St, Woburn, MA 01801",
+            courts: parseInt(settings.courts, 10) || 2,
+            cost_per_person: parseFloat(settings.cost_per_person) || 23,
+            max_players: parseInt(maxPlayers, 10) || 8,
+            notes: notes || "2 Courts reserved for doubles play!"
+          }])
+          .select()
+          .single();
+
+        if (error) {
+          if (error.code === "23505") throw new Error("A session for this date already exists.");
+          throw error;
+        }
+
+        return { success: true, id: inserted.id };
+      } catch (e) {
+        if (e.message && e.message.includes("already exists")) throw e;
+        console.warn("Supabase addSession error, falling back:", e);
+      }
+    }
+
     if (await this.checkBackend()) {
       try {
         const res = await fetch("/api/sessions", {
@@ -420,6 +710,19 @@ const DataManager = {
 
   async deleteSession(sessionId) {
     sessionId = parseInt(sessionId, 10);
+    const sb = getSupabase();
+    if (await this.checkSupabase()) {
+      try {
+        await sb.from("signups").delete().eq("session_id", sessionId);
+        const { error } = await sb.from("sessions").delete().eq("id", sessionId);
+        if (!error) {
+          return { success: true, deleted_session_id: sessionId };
+        }
+      } catch (e) {
+        console.warn("Supabase deleteSession error, falling back:", e);
+      }
+    }
+
     if (await this.checkBackend()) {
       try {
         const res = await fetch(`/api/sessions/${sessionId}`, { method: "DELETE" });
@@ -442,7 +745,43 @@ document.addEventListener("DOMContentLoaded", async () => {
   setupEventListeners();
   await loadSettings();
   await loadSessions();
+  initRealtimeSync();
 });
+
+function initRealtimeSync() {
+  const sb = getSupabase();
+  if (!sb) return;
+  try {
+    sb.channel("pickleball-realtime-sync")
+      .on("postgres_changes", { event: "*", schema: "public", table: "signups" }, async () => {
+        await reloadRosterPreservingSelection();
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "sessions" }, async () => {
+        await loadSessions();
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "settings" }, async () => {
+        await loadSettings();
+      })
+      .subscribe((status) => {
+        console.log("Supabase Realtime subscription status:", status);
+      });
+  } catch (e) {
+    console.warn("Realtime sync setup exception:", e);
+  }
+}
+
+async function reloadRosterPreservingSelection() {
+  try {
+    state.sessions = await DataManager.getSessions();
+    renderDatesCarousel();
+    if (state.currentSessionId) {
+      state.currentSession = await DataManager.getSessionById(state.currentSessionId);
+      renderSessionView();
+    }
+  } catch (e) {
+    console.warn("Error reloading roster on realtime event:", e);
+  }
+}
 
 function setupEventListeners() {
   // Select dropdown in Sign-Up Card
