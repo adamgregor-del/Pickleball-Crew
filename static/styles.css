@@ -306,14 +306,18 @@ body {
   justify-content: center;
   gap: 6px;
   font-family: inherit;
-  font-weight: 600;
-  font-size: 0.9rem;
-  padding: 10px 18px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 12px 18px;
+  min-height: 44px;
   border-radius: var(--radius-md);
   border: none;
   cursor: pointer;
   transition: all 0.15s ease-in-out;
   text-decoration: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 
 .btn:active {
@@ -340,13 +344,20 @@ body {
   background-color: #38bdf8;
   color: #0c4a6e;
   font-weight: 700;
-  padding: 6px 12px;
+  padding: 8px 14px;
+  min-height: 38px;
   border-radius: 8px;
   font-size: 0.85rem;
   border: none;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
-.btn-venmo-sm:hover {
+.btn-venmo-sm:hover, .btn-venmo-sm:active {
   background-color: #7dd3fc;
 }
 
@@ -354,12 +365,20 @@ body {
   background: rgba(255, 255, 255, 0.15);
   color: white;
   border: 1px solid rgba(255, 255, 255, 0.3);
-  padding: 6px 10px;
+  padding: 8px 12px;
+  min-height: 38px;
   border-radius: 8px;
   font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
-.btn-outline-sm:hover {
+.btn-outline-sm:hover, .btn-outline-sm:active {
   background: rgba(255, 255, 255, 0.25);
 }
 
@@ -367,10 +386,20 @@ body {
   background: rgba(255, 255, 255, 0.1);
   color: white;
   border: none;
-  padding: 6px 10px;
+  padding: 8px 12px;
+  min-height: 38px;
   border-radius: 8px;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.btn-ghost-sm:hover, .btn-ghost-sm:active {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .btn-secondary {
@@ -454,9 +483,11 @@ body {
   display: flex;
   gap: 10px;
   overflow-x: auto;
-  padding: 4px 2px 10px 2px;
-  scrollbar-width: thin;
+  scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  padding: 6px 2px 12px 2px;
+  scrollbar-width: thin;
 }
 
 .dates-carousel::-webkit-scrollbar {
@@ -469,12 +500,16 @@ body {
 
 .date-pill {
   flex: 0 0 auto;
+  scroll-snap-align: start;
   background: var(--card-bg);
   border: 2px solid var(--border);
   border-radius: var(--radius-md);
   padding: 10px 14px;
   text-align: center;
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
   transition: all 0.15s ease;
   min-width: 110px;
 }
@@ -711,15 +746,18 @@ body {
 }
 
 .form-group input {
-  padding: 10px 12px;
+  padding: 10px 14px;
   border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
   font-family: inherit;
-  font-size: 0.95rem;
+  font-size: 16px; /* Prevents auto-zoom in iOS Safari */
+  min-height: 44px;
   color: var(--text-main);
   background: #ffffff;
   outline: none;
-  transition: border-color 0.15s ease;
+  width: 100%;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  -webkit-appearance: none;
 }
 
 .form-group input:focus {
@@ -818,13 +856,18 @@ body {
 .pay-toggle-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 5px;
-  padding: 6px 10px;
+  padding: 6px 12px;
+  min-height: 34px;
   border-radius: 20px;
-  font-size: 0.75rem;
+  font-size: 0.76rem;
   font-weight: 700;
   border: none;
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
   transition: all 0.15s ease;
 }
 
@@ -833,7 +876,7 @@ body {
   color: #15803d;
   border: 1px solid #86efac;
 }
-.pay-toggle-btn.paid:hover {
+.pay-toggle-btn.paid:hover, .pay-toggle-btn.paid:active {
   background: #bbf7d0;
 }
 
@@ -842,7 +885,7 @@ body {
   color: #b45309;
   border: 1px solid #fde68a;
 }
-.pay-toggle-btn.unpaid:hover {
+.pay-toggle-btn.unpaid:hover, .pay-toggle-btn.unpaid:active {
   background: #fde68a;
 }
 
@@ -851,13 +894,21 @@ body {
   background: #f0f9ff;
   border: 1px solid #bae6fd;
   color: #0284c7;
-  font-weight: 600;
-  font-size: 0.75rem;
-  padding: 6px 9px;
+  font-weight: 700;
+  font-size: 0.76rem;
+  padding: 6px 10px;
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 8px;
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  transition: background-color 0.15s ease;
 }
-.btn-row-venmo:hover {
+.btn-row-venmo:hover, .btn-row-venmo:active {
   background: #e0f2fe;
 }
 
@@ -865,12 +916,21 @@ body {
   background: transparent;
   border: none;
   color: #94a3b8;
-  font-size: 1.1rem;
-  padding: 4px;
+  font-size: 1.35rem;
+  min-width: 34px;
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 6px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  transition: color 0.15s ease, background-color 0.15s ease;
 }
-.btn-row-delete:hover {
+.btn-row-delete:hover, .btn-row-delete:active {
   color: var(--danger);
   background: #fef2f2;
 }
@@ -1136,22 +1196,6 @@ body {
   font-weight: 600;
 }
 
-/* Responsive */
-@media (max-width: 480px) {
-  .app-container {
-    padding: 12px;
-  }
-  .hero-header {
-    padding: 20px 16px;
-  }
-  .hero-title {
-    font-size: 1.5rem;
-  }
-  .form-row {
-    flex-direction: column;
-  }
-}
-
 /* Compact Thursday Session Section (Small) */
 .compact-session-section {
   background: var(--card-bg);
@@ -1241,17 +1285,18 @@ body {
 
 /* Form Select */
 .form-select {
-  padding: 10px 12px;
+  padding: 10px 14px;
   border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
   font-family: inherit;
-  font-size: 0.95rem;
+  font-size: 16px; /* Prevents auto-zoom in iOS Safari */
+  min-height: 44px;
   color: var(--text-main);
   background: #ffffff;
   outline: none;
   width: 100%;
   cursor: pointer;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .form-select:focus {
@@ -1290,4 +1335,171 @@ body {
   color: var(--text-muted);
   margin-top: 4px;
   line-height: 1.35;
+}
+
+/* ============================================================= */
+/* Comprehensive Responsive Styles: Mobile & Cross-Device Support */
+/* ============================================================= */
+
+/* Tablet & Large Mobile (<= 768px) */
+@media (max-width: 768px) {
+  body {
+    padding: max(20px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(48px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  }
+  .app-container {
+    max-width: 100%;
+    padding: 22px 18px;
+    border-radius: 24px;
+  }
+  .bg-ball-1 { width: 120px; height: 120px; left: 1%; }
+  .bg-ball-2 { width: 140px; height: 140px; right: 1%; }
+  .bg-ball-4 { width: 130px; height: 130px; right: 1%; }
+}
+
+/* Standard Mobile Phones (<= 640px) */
+@media (max-width: 640px) {
+  body {
+    padding: max(14px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(40px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  }
+  .app-container {
+    padding: 16px 12px;
+    border-radius: 22px;
+    box-shadow: 
+      0 20px 45px -10px rgba(0, 0, 0, 0.7),
+      0 0 0 1px rgba(255, 255, 255, 0.16),
+      0 1px 0 rgba(255, 255, 255, 0.9) inset;
+  }
+  .bg-pb-ball {
+    opacity: 0.08; /* subtle on small screens */
+  }
+  .hero-header {
+    padding: 18px 14px;
+    border-radius: 16px;
+    margin-bottom: 16px;
+  }
+  .hero-title {
+    font-size: 1.45rem;
+    gap: 6px;
+  }
+  .pickleball-header-icon {
+    width: 1.15em;
+    height: 1.15em;
+  }
+  .hero-subtitle {
+    font-size: 0.88rem;
+    margin-bottom: 12px;
+  }
+  .card, .compact-session-section, .roster-section {
+    padding: 16px 14px;
+    border-radius: 16px;
+    margin-bottom: 16px;
+  }
+  .hero-meta-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding-top: 12px;
+  }
+  .venmo-recipient-pill {
+    width: 100%;
+    justify-content: center;
+    font-size: 0.82rem;
+  }
+  .hero-actions {
+    display: flex;
+    width: 100%;
+    gap: 8px;
+  }
+  .hero-actions .btn-venmo-sm {
+    flex: 2;
+    padding: 9px 12px;
+    font-size: 0.88rem;
+  }
+  .hero-actions .btn-outline-sm {
+    flex: 2;
+    padding: 9px 12px;
+    font-size: 0.88rem;
+  }
+  .hero-actions .btn-ghost-sm {
+    flex: 0 0 42px;
+    padding: 0;
+  }
+  .roster-item {
+    padding: 10px 10px;
+    gap: 8px;
+  }
+  .roster-left {
+    gap: 8px;
+  }
+  .roster-name {
+    font-size: 0.9rem;
+  }
+  .roster-sub {
+    font-size: 0.72rem;
+    gap: 4px;
+  }
+  .pay-toggle-btn {
+    padding: 5px 9px;
+    font-size: 0.73rem;
+  }
+  .btn-row-venmo {
+    padding: 5px 8px;
+    font-size: 0.73rem;
+  }
+  .compact-session-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .compact-session-actions {
+    display: flex;
+    width: 100%;
+    justify-content: flex-start;
+    gap: 12px;
+  }
+  .compact-stats-bar {
+    font-size: 0.76rem;
+    gap: 4px 6px;
+  }
+}
+
+/* Narrow Screens (<= 380px, e.g. iPhone SE) */
+@media (max-width: 380px) {
+  body {
+    padding: 10px 4px 32px;
+  }
+  .app-container {
+    padding: 14px 10px;
+    border-radius: 18px;
+  }
+  .hero-title {
+    font-size: 1.3rem;
+  }
+  .roster-item {
+    padding: 8px 8px;
+  }
+  .roster-number {
+    width: 24px;
+    height: 24px;
+    font-size: 0.72rem;
+  }
+  .pay-toggle-btn, .btn-row-venmo {
+    font-size: 0.7rem;
+    padding: 4px 6px;
+  }
+  .btn-row-delete {
+    min-width: 28px;
+    min-height: 28px;
+  }
+}
+
+/* Accessibility: Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .bg-pb-ball {
+    animation: none !important;
+  }
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }
