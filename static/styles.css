@@ -96,6 +96,18 @@ body {
   font-weight: 800;
   letter-spacing: -0.5px;
   margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.pickleball-header-icon {
+  width: 1.2em;
+  height: 1.2em;
+  display: inline-block;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.3));
 }
 
 .hero-subtitle {

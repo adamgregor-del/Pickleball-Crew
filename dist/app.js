@@ -1060,7 +1060,6 @@ function renderConfirmedRoster(sess) {
             <div class="roster-name">${escapeHtml(player.player_name)}</div>
             <div class="roster-sub">
               <span>Court ${courtNum}</span>
-              ${player.phone ? `<span>• 📞 ${escapeHtml(player.phone)}</span>` : ""}
               ${player.notes ? `<span>• 💬 ${escapeHtml(player.notes)}</span>` : ""}
             </div>
           </div>
@@ -1111,7 +1110,6 @@ function renderWaitlist(sess) {
           <div class="roster-name">${escapeHtml(p.player_name)}</div>
           <div class="roster-sub">
             <span>Waitlist Priority #${idx + 1}</span>
-            ${p.phone ? `<span>• 📞 ${escapeHtml(p.phone)}</span>` : ""}
             ${p.notes ? `<span>• 💬 ${escapeHtml(p.notes)}</span>` : ""}
           </div>
         </div>
@@ -1133,10 +1131,10 @@ function renderWaitlist(sess) {
     waitlistList.appendChild(item);
   });
 
-  // Always show open waitlist slots so space is always visible
-  const minWaitlistSlots = 3;
+  // Always show open waitlist slots so space is always visible (5 slots minimum)
+  const minWaitlistSlots = 5;
   const startSlot = waitlist.length + 1;
-  const endSlot = Math.max(minWaitlistSlots, waitlist.length + 1);
+  const endSlot = Math.max(minWaitlistSlots, waitlist.length + 2);
 
   for (let slot = startSlot; slot <= endSlot; slot++) {
     const placeholder = document.createElement("div");
@@ -1169,12 +1167,11 @@ async function handleSignup(e) {
   if (!state.currentSessionId) return;
 
   const nameInput = document.getElementById("playerName");
-  const phoneInput = document.getElementById("playerPhone");
   const notesInput = document.getElementById("playerNotes");
 
   const playerName = nameInput.value.trim();
-  const phone = phoneInput.value.trim();
-  const notes = notesInput.value.trim();
+  const phone = "";
+  const notes = notesInput ? notesInput.value.trim() : "";
 
   if (!playerName) {
     showToast("Please enter your name");
@@ -1188,8 +1185,7 @@ async function handleSignup(e) {
     const data = await DataManager.addSignup(state.currentSessionId, playerName, phone, notes);
 
     nameInput.value = "";
-    phoneInput.value = "";
-    notesInput.value = "";
+    if (notesInput) notesInput.value = "";
 
     if (data.is_waitlist) {
       showToast(`Added to the Waitlist (#${data.session.waitlist_players.length})!`);
