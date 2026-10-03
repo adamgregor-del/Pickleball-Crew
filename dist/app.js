@@ -18,6 +18,7 @@ let state = {
 
 // DOM Elements
 const signupDateSelect = document.getElementById("signupDateSelect");
+const viewConfirmedSelect = document.getElementById("viewConfirmedSelect");
 const datesCarousel = document.getElementById("datesCarousel");
 const currentDateHeading = document.getElementById("currentDateHeading");
 const currentLocationSub = document.getElementById("currentLocationSub");
@@ -792,6 +793,14 @@ function setupEventListeners() {
     });
   }
 
+  // Dropdown for "View confirmed players for [date]"
+  if (viewConfirmedSelect) {
+    viewConfirmedSelect.addEventListener("change", (e) => {
+      const selectedId = parseInt(e.target.value, 10);
+      if (selectedId) selectSession(selectedId);
+    });
+  }
+
   // Venmo Modal triggers
   openVenmoModalBtn.addEventListener("click", () => openVenmoPaymentModal());
   closeVenmoModal.addEventListener("click", () => closeModal(venmoModal));
@@ -934,6 +943,15 @@ async function loadSessions() {
         }).join("");
       }
 
+      // Populate "View confirmed players for [date]" dropdown
+      if (viewConfirmedSelect) {
+        viewConfirmedSelect.innerHTML = state.sessions.map(s => {
+          const pretty = formatDateLong(s.session_date);
+          const spotsText = s.spots_remaining > 0 ? `${s.spots_remaining} open` : `Full (${s.waitlist_count} waitlist)`;
+          return `<option value="${s.id}">${pretty} (${spotsText})</option>`;
+        }).join("");
+      }
+
       renderDatesCarousel();
 
       // Select first session if not already selected
@@ -943,15 +961,19 @@ async function loadSessions() {
         selectSession(state.currentSessionId);
       }
     } else {
-      datesCarousel.innerHTML = `<div class="dates-loading">No upcoming sessions. Click + Add Date to create one.</div>`;
+      if (datesCarousel) datesCarousel.innerHTML = `<div class="dates-loading">No upcoming sessions. Click + Add Date to create one.</div>`;
     }
   } catch (err) {
     console.error("Error loading sessions:", err);
-    datesCarousel.innerHTML = `<div class="dates-loading">Failed to load sessions.</div>`;
+    if (datesCarousel) datesCarousel.innerHTML = `<div class="dates-loading">Failed to load sessions.</div>`;
   }
 }
 
 function renderDatesCarousel() {
+  if (viewConfirmedSelect && state.currentSessionId) {
+    viewConfirmedSelect.value = state.currentSessionId;
+  }
+  if (!datesCarousel) return;
   datesCarousel.innerHTML = "";
   state.sessions.forEach(sess => {
     const pill = document.createElement("div");
@@ -988,6 +1010,9 @@ async function selectSession(sessionId) {
   state.currentSessionId = sessionId;
   if (signupDateSelect && signupDateSelect.value != sessionId) {
     signupDateSelect.value = sessionId;
+  }
+  if (viewConfirmedSelect && viewConfirmedSelect.value != sessionId) {
+    viewConfirmedSelect.value = sessionId;
   }
   renderDatesCarousel();
 
@@ -1109,7 +1134,7 @@ function renderWaitlist(sess) {
         <div class="roster-details">
           <div class="roster-name">${escapeHtml(p.player_name)}</div>
           <div class="roster-sub">
-            <span>Waitlist Priority #${idx + 1}</span>
+            <span>Waitlist</span>
             ${p.notes ? `<span>• 💬 ${escapeHtml(p.notes)}</span>` : ""}
           </div>
         </div>
@@ -1141,7 +1166,7 @@ function renderWaitlist(sess) {
     placeholder.className = "waitlist-empty-spot";
     placeholder.innerHTML = `
       <div class="roster-number">W${slot}</div>
-      <span>Waitlist Spot #${slot} — Available for subs / extra players</span>
+      <span>Waitlist</span>
     `;
     waitlistList.appendChild(placeholder);
   }
