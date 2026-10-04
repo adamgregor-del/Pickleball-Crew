@@ -803,10 +803,10 @@ body {
   font-weight: 700;
   font-size: 0.95rem;
   color: var(--text-main);
-  white-space: normal;
-  word-break: break-word;
-  overflow-wrap: break-word;
-  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
 }
 
 .roster-sub {
@@ -1416,13 +1416,8 @@ body {
     gap: 6px;
   }
   .hero-actions .btn-venmo-sm {
-    flex: 2;
-    padding: 8px 10px;
-    font-size: 0.85rem;
-  }
-  .hero-actions .btn-outline-sm {
-    flex: 2;
-    padding: 8px 10px;
+    flex: 1;
+    padding: 8px 14px;
     font-size: 0.85rem;
   }
   .hero-actions .btn-ghost-sm {
@@ -1439,11 +1434,11 @@ body {
     min-width: 0;
   }
   .roster-name {
-    font-size: 0.9rem;
-    white-space: normal;
-    word-break: break-word;
-    overflow-wrap: break-word;
-    line-height: 1.25;
+    font-size: 0.92rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
   }
   .roster-sub {
     font-size: 0.72rem;
@@ -1451,17 +1446,12 @@ body {
     flex-wrap: wrap;
   }
   .roster-right {
-    gap: 4px;
+    gap: 6px;
     flex-shrink: 0;
   }
   .pay-toggle-btn {
-    padding: 4px 8px;
-    font-size: 0.72rem;
-    min-height: 30px;
-  }
-  .btn-row-venmo {
-    padding: 4px 8px;
-    font-size: 0.72rem;
+    padding: 5px 10px;
+    font-size: 0.74rem;
     min-height: 30px;
   }
   .btn-row-delete {
@@ -1515,19 +1505,19 @@ body {
     font-size: 0.7rem;
   }
   .roster-name {
-    font-size: 0.85rem;
-    white-space: normal;
-    word-break: break-word;
-    overflow-wrap: break-word;
-    line-height: 1.25;
+    font-size: 0.88rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
   }
   .roster-right {
-    gap: 3px;
+    gap: 4px;
     flex-shrink: 0;
   }
-  .pay-toggle-btn, .btn-row-venmo {
-    font-size: 0.68rem;
-    padding: 4px 5px;
+  .pay-toggle-btn {
+    font-size: 0.7rem;
+    padding: 4px 8px;
     min-height: 28px;
   }
   .btn-row-delete {

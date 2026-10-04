@@ -846,9 +846,8 @@ function setupEventListeners() {
   // Sign up Form
   signupForm.addEventListener("submit", handleSignup);
 
-  // Share & Copy
-  shareInviteBtn.addEventListener("click", handleShareInvite);
-  copyRosterBtn.addEventListener("click", handleCopyRoster);
+  // Copy Roster
+  if (copyRosterBtn) copyRosterBtn.addEventListener("click", handleCopyRoster);
 
   // Remove Player Modal (Android & Mobile Safe)
   if (closeRemovePlayerModal) {
@@ -868,6 +867,14 @@ function setupEventListeners() {
 }
 
 // Helpers
+function formatShortName(fullName) {
+  if (!fullName) return "";
+  const parts = fullName.trim().split(/\s+/);
+  if (parts.length <= 1) return parts[0];
+  const firstName = parts[0];
+  const lastInitial = parts[parts.length - 1].charAt(0).toUpperCase();
+  return `${firstName} ${lastInitial}.`;
+}
 function showToast(msg, duration = 3000) {
   toast.textContent = msg;
   toast.classList.add("show");
@@ -1106,7 +1113,7 @@ function renderConfirmedRoster(sess) {
         <div class="roster-left">
           <div class="roster-number" title="Court ${courtNum} (Spot ${spot})">${spot}</div>
           <div class="roster-details">
-            <div class="roster-name">${escapeHtml(player.player_name)}</div>
+            <div class="roster-name" title="${escapeHtml(player.player_name)}">${escapeHtml(formatShortName(player.player_name))}</div>
             <div class="roster-sub">
               <span>Court ${courtNum}</span>
               ${player.notes ? `<span>• 💬 ${escapeHtml(player.notes)}</span>` : ""}
@@ -1118,9 +1125,6 @@ function renderConfirmedRoster(sess) {
                   onclick="togglePayment(${player.id})" 
                   title="Click to toggle Paid/Unpaid">
             ${isPaid ? "✓ Paid" : "○ Unpaid"}
-          </button>
-          <button class="btn-row-venmo" onclick="openVenmoPaymentModal('${escapeHtml(player.player_name)}', ${player.id}, ${isPaid})">
-            Venmo
           </button>
           <button type="button" class="btn-row-delete" onclick="openRemovePlayerModal(${player.id}, '${escapeHtml(player.player_name).replace(/'/g, "\\'")}')" title="Remove player" aria-label="Remove ${escapeHtml(player.player_name)}">
             &times;
@@ -1156,7 +1160,7 @@ function renderWaitlist(sess) {
       <div class="roster-left">
         <div class="roster-number">W${idx + 1}</div>
         <div class="roster-details">
-          <div class="roster-name">${escapeHtml(p.player_name)}</div>
+          <div class="roster-name" title="${escapeHtml(p.player_name)}">${escapeHtml(formatShortName(p.player_name))}</div>
           <div class="roster-sub">
             <span>Waitlist</span>
             ${p.notes ? `<span>• 💬 ${escapeHtml(p.notes)}</span>` : ""}
@@ -1168,9 +1172,6 @@ function renderWaitlist(sess) {
                 onclick="togglePayment(${p.id})" 
                 title="Click to toggle Paid/Unpaid">
           ${isPaid ? "✓ Paid" : "○ Unpaid"}
-        </button>
-        <button class="btn-row-venmo" onclick="openVenmoPaymentModal('${escapeHtml(p.player_name)}', ${p.id}, ${isPaid})">
-          Venmo
         </button>
         <button type="button" class="btn-row-delete" onclick="openRemovePlayerModal(${p.id}, '${escapeHtml(p.player_name).replace(/'/g, "\\'")}')" title="Remove from waitlist" aria-label="Remove ${escapeHtml(p.player_name)}">
           &times;
