@@ -225,23 +225,17 @@
         </div>
 
         <form id="signupForm" class="signup-form">
-          <div class="form-group custom-select-group">
-            <label for="signupDateTrigger" id="signupDateLabel">Select Thursday Session *</label>
-            <div class="custom-select-container" id="signupDateContainer">
-              <button type="button" class="custom-select-trigger" id="signupDateTrigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="signupDateLabel signupDateTriggerLabel">
-                <span class="custom-select-label" id="signupDateTriggerLabel">Select a session date...</span>
-                <span class="custom-select-arrow" aria-hidden="true">
-                  <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
-                  </svg>
-                </span>
-              </button>
-              <div class="custom-select-menu" id="signupDateMenu" role="listbox" tabindex="-1">
-                <!-- Session options rendered dynamically -->
-              </div>
-            </div>
-            <select id="signupDateSelect" class="form-select hidden-select" style="display: none;" aria-hidden="true" tabindex="-1" required>
-              <!-- Options populated dynamically for form fallback -->
+          <div class="form-group">
+            <label for="signupDateSelect">Select Thursday Session *</label>
+            <select id="signupDateSelect" class="form-select" required>
+              <option value="1">Thursday, October 15th • 7:00 PM — 8 spots open</option>
+              <option value="2">Thursday, October 22nd • 7:00 PM — 8 spots open</option>
+              <option value="3">Thursday, October 29th • 7:00 PM — 8 spots open</option>
+              <option value="4">Thursday, November 5th • 7:00 PM — 8 spots open</option>
+              <option value="5">Thursday, November 12th • 7:00 PM — 8 spots open</option>
+              <option value="6">Thursday, November 19th • 7:00 PM — 8 spots open</option>
+              <option value="7">Thursday, December 3rd • 7:00 PM — 8 spots open</option>
+              <option value="8">Thursday, December 10th • 7:00 PM — 8 spots open</option>
             </select>
           </div>
           <div class="form-group">
@@ -261,7 +255,7 @@
     <section class="session-dropdown-section" id="sessionCard">
       <div class="session-dropdown-card">
         <div class="session-dropdown-header">
-          <label for="viewConfirmedTrigger" class="session-dropdown-label" id="viewConfirmedLabel">
+          <label for="viewConfirmedSelect" class="session-dropdown-label">
             <span class="dropdown-label-title">View confirmed players for:</span>
           </label>
           <div class="compact-session-actions">
@@ -270,22 +264,15 @@
           </div>
         </div>
 
-        <div class="custom-select-container" id="viewConfirmedContainer">
-          <button type="button" class="custom-select-trigger view-confirmed-trigger" id="viewConfirmedTrigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="viewConfirmedLabel viewConfirmedTriggerLabel">
-            <span class="custom-select-label" id="viewConfirmedTriggerLabel">Select a session date...</span>
-            <span class="custom-select-arrow" aria-hidden="true">
-              <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
-              </svg>
-            </span>
-          </button>
-          <div class="custom-select-menu" id="viewConfirmedMenu" role="listbox" tabindex="-1">
-            <!-- Populated dynamically with dates -->
-          </div>
-        </div>
-
-        <select id="viewConfirmedSelect" class="form-select view-confirmed-select hidden-select" style="display: none;" aria-hidden="true" tabindex="-1" aria-label="View confirmed players for date">
-          <!-- Populated dynamically with dates -->
+        <select id="viewConfirmedSelect" class="form-select view-confirmed-select" aria-label="View confirmed players for date">
+          <option value="1">Thursday, October 15th • 7:00 PM (8 open)</option>
+          <option value="2">Thursday, October 22nd • 7:00 PM (8 open)</option>
+          <option value="3">Thursday, October 29th • 7:00 PM (8 open)</option>
+          <option value="4">Thursday, November 5th • 7:00 PM (8 open)</option>
+          <option value="5">Thursday, November 12th • 7:00 PM (8 open)</option>
+          <option value="6">Thursday, November 19th • 7:00 PM (8 open)</option>
+          <option value="7">Thursday, December 3rd • 7:00 PM (8 open)</option>
+          <option value="8">Thursday, December 10th • 7:00 PM (8 open)</option>
         </select>
 
         <!-- Hidden elements for backward compatibility -->

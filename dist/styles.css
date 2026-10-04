@@ -1291,231 +1291,48 @@ body {
   color: #cbd5e1;
 }
 
-/* Form Select */
+/* Form Select Dropdown (Optimized for both iOS & Android) */
 .form-select {
-  padding: 10px 14px;
+  padding: 12px 42px 12px 14px;
   border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
   font-family: inherit;
-  font-size: 16px; /* Prevents auto-zoom in iOS Safari */
-  min-height: 44px;
-  color: var(--text-main);
-  background: #ffffff;
-  outline: none;
-  width: 100%;
-  cursor: pointer;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-.form-select:focus {
-  border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
-}
-
-/* Custom Accessible Dropdowns (Bulletproof across Android, iOS & Desktop) */
-.custom-select-container {
-  position: relative;
-  width: 100%;
-}
-
-.custom-select-trigger {
-  width: 100%;
-  min-height: 46px;
-  padding: 10px 14px;
-  background: #ffffff;
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  font-family: inherit;
-  font-size: 15px;
+  font-size: 16px; /* Strict 16px to prevent iOS Safari auto-zoom */
   font-weight: 600;
+  min-height: 48px;
+  line-height: 1.3;
   color: var(--text-main);
-  cursor: pointer;
-  text-align: left;
+  background-color: #ffffff;
+  /* SVG Dropdown Arrow that renders consistently and crisply on all mobile & desktop browsers */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23334155' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
   outline: none;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.custom-select-trigger:focus-visible,
-.custom-select-container.open .custom-select-trigger {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
-}
-
-.view-confirmed-trigger {
-  background-color: #f8fafc;
-  border-radius: 10px;
-  margin-bottom: 4px;
-}
-
-.custom-select-label {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex: 1;
-  gap: 8px;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.custom-select-label .trigger-date-text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.custom-select-arrow {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #64748b;
-  transition: transform 0.2s ease, color 0.2s ease;
-  flex-shrink: 0;
-}
-
-.custom-select-container.open .custom-select-arrow {
-  transform: rotate(180deg);
-  color: var(--primary);
-}
-
-.custom-select-menu {
-  display: none;
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  right: 0;
-  z-index: 100;
-  background: #ffffff;
-  border: 1.5px solid var(--border);
-  border-radius: 14px;
-  box-shadow: 
-    0 14px 32px -4px rgba(15, 23, 42, 0.18),
-    0 4px 10px rgba(0, 0, 0, 0.06);
-  max-height: 280px;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding: 6px;
-}
-
-.custom-select-container.open .custom-select-menu {
+  width: 100%;
+  cursor: pointer;
   display: block;
-  animation: selectMenuFadeIn 0.14s ease-out;
-}
-
-@keyframes selectMenuFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.custom-select-option {
-  padding: 10px 12px;
-  min-height: 44px;
-  border-radius: 9px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  cursor: pointer;
-  font-size: 14.5px;
-  color: #1e293b;
-  transition: background-color 0.12s ease;
-  user-select: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
+  -webkit-tap-highlight-color: rgba(5, 150, 105, 0.15);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
 }
 
-.custom-select-option:hover,
-.custom-select-option:active {
-  background-color: #f1f5f9;
+.form-select:focus,
+.form-select:active {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.18);
 }
 
-.custom-select-option.selected {
-  background-color: #ecfdf5;
-  color: #065f46;
-  font-weight: 700;
-}
-
-.custom-select-option .option-date-text {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex: 1;
-  min-width: 0;
-}
-
-.option-check {
-  display: inline-block;
-  width: 16px;
-  font-weight: 800;
-  color: #059669;
-  flex-shrink: 0;
-}
-
-.option-check-spacer {
-  display: inline-block;
-  width: 16px;
-  flex-shrink: 0;
-}
-
-.option-spots-badge {
-  font-size: 12px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 9999px;
-  flex-shrink: 0;
-}
-
-.option-badge-open {
-  background: #e0f2fe;
-  color: #0369a1;
-}
-
-.option-badge-full {
-  background: #fef2f2;
-  color: #b91c1c;
-}
-
-.trigger-spots-pill {
-  font-size: 12px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 9999px;
-  flex-shrink: 0;
-}
-
-.trigger-spots-pill.badge-open {
-  background: #e0f2fe;
-  color: #0369a1;
-}
-
-.trigger-spots-pill.badge-full {
-  background: #fef2f2;
-  color: #b91c1c;
-}
-
-.hidden-select {
-  position: absolute !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  height: 0 !important;
-  width: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  border: 0 !important;
+.form-select option {
+  font-size: 16px;
+  font-weight: 500;
+  color: #0f172a;
+  background-color: #ffffff;
+  padding: 8px 12px;
 }
 
 /* Waitlist section always visible */
