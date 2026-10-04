@@ -764,6 +764,7 @@ body {
   align-items: center;
   gap: 12px;
   min-width: 0;
+  flex: 1 1 auto;
 }
 
 .roster-number {
@@ -795,14 +796,17 @@ body {
 
 .roster-details {
   min-width: 0;
+  flex: 1 1 auto;
 }
 
 .roster-name {
   font-weight: 700;
   font-size: 0.95rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: var(--text-main);
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.25;
 }
 
 .roster-sub {
@@ -810,7 +814,8 @@ body {
   color: var(--text-muted);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  flex-wrap: wrap;
   margin-top: 2px;
 }
 
@@ -1020,7 +1025,36 @@ body {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-top: 18px;
+.modal-card-sm {
+  max-width: 360px;
+  width: 90%;
+  margin: auto;
+}
+
+.modal-confirm-text {
+  font-size: 0.95rem;
+  color: var(--text-main);
+  margin: 10px 0 20px;
+  line-height: 1.45;
+}
+
+.modal-confirm-text strong {
+  color: #0f172a;
+}
+
+.modal-confirm-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-danger {
+  background: #dc2626;
+  color: #ffffff;
+  border: none;
+}
+
+.btn-danger:hover, .btn-danger:active {
+  background: #b91c1c;
 }
 
 .text-center {
@@ -1401,21 +1435,41 @@ body {
   }
   .roster-left {
     gap: 8px;
+    flex: 1 1 auto;
+    min-width: 0;
   }
   .roster-name {
     font-size: 0.9rem;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.25;
   }
   .roster-sub {
     font-size: 0.72rem;
     gap: 4px;
+    flex-wrap: wrap;
+  }
+  .roster-right {
+    gap: 4px;
+    flex-shrink: 0;
   }
   .pay-toggle-btn {
-    padding: 5px 9px;
-    font-size: 0.73rem;
+    padding: 4px 8px;
+    font-size: 0.72rem;
+    min-height: 30px;
   }
   .btn-row-venmo {
-    padding: 5px 8px;
-    font-size: 0.73rem;
+    padding: 4px 8px;
+    font-size: 0.72rem;
+    min-height: 30px;
+  }
+  .btn-row-delete {
+    min-width: 30px;
+    min-height: 30px;
+    width: 30px;
+    height: 30px;
+    font-size: 1.35rem;
   }
   .compact-session-header {
     flex-direction: column;
@@ -1447,20 +1501,41 @@ body {
     font-size: 1.3rem;
   }
   .roster-item {
-    padding: 8px 8px;
+    padding: 8px 6px;
+    gap: 6px;
+  }
+  .roster-left {
+    gap: 6px;
+    flex: 1 1 auto;
+    min-width: 0;
   }
   .roster-number {
-    width: 24px;
-    height: 24px;
-    font-size: 0.72rem;
+    width: 22px;
+    height: 22px;
+    font-size: 0.7rem;
+  }
+  .roster-name {
+    font-size: 0.85rem;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.25;
+  }
+  .roster-right {
+    gap: 3px;
+    flex-shrink: 0;
   }
   .pay-toggle-btn, .btn-row-venmo {
-    font-size: 0.7rem;
-    padding: 4px 6px;
+    font-size: 0.68rem;
+    padding: 4px 5px;
+    min-height: 28px;
   }
   .btn-row-delete {
     min-width: 28px;
     min-height: 28px;
+    width: 28px;
+    height: 28px;
+    font-size: 1.25rem;
   }
 }
 

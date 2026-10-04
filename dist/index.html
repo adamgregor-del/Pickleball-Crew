@@ -453,6 +453,25 @@
     </div>
   </div>
 
+  <!-- Remove Player Modal (Replaces native window.confirm to avoid Android shutdown) -->
+  <div class="modal-backdrop" id="removePlayerModal" style="display: none;">
+    <div class="modal-card modal-card-sm">
+      <div class="modal-header">
+        <h3>Remove Player</h3>
+        <button type="button" class="modal-close" id="closeRemovePlayerModal">&times;</button>
+      </div>
+      <div class="modal-body text-center">
+        <p class="modal-confirm-text">
+          Are you sure you want to remove <strong id="removePlayerNameText">—</strong> from this session?
+        </p>
+        <div class="modal-confirm-actions">
+          <button type="button" class="btn btn-secondary flex-1" id="cancelRemovePlayerBtn">Cancel</button>
+          <button type="button" class="btn btn-danger flex-1" id="confirmRemovePlayerBtn">Remove</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification -->
   <div id="toast" class="toast"></div>
 

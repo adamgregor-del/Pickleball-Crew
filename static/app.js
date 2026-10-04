@@ -64,6 +64,14 @@ const deleteSessionBtn = document.getElementById("deleteSessionBtn");
 const shareInviteBtn = document.getElementById("shareInviteBtn");
 const copyRosterBtn = document.getElementById("copyRosterBtn");
 
+const removePlayerModal = document.getElementById("removePlayerModal");
+const closeRemovePlayerModal = document.getElementById("closeRemovePlayerModal");
+const cancelRemovePlayerBtn = document.getElementById("cancelRemovePlayerBtn");
+const confirmRemovePlayerBtn = document.getElementById("confirmRemovePlayerBtn");
+const removePlayerNameText = document.getElementById("removePlayerNameText");
+let pendingDeleteSignupId = null;
+let pendingDeletePlayerName = "";
+
 // -------------------------------------------------------------
 // Supabase Configuration & Universal Data Manager
 // -------------------------------------------------------------
@@ -841,6 +849,22 @@ function setupEventListeners() {
   // Share & Copy
   shareInviteBtn.addEventListener("click", handleShareInvite);
   copyRosterBtn.addEventListener("click", handleCopyRoster);
+
+  // Remove Player Modal (Android & Mobile Safe)
+  if (closeRemovePlayerModal) {
+    closeRemovePlayerModal.addEventListener("click", closeRemoveModal);
+  }
+  if (cancelRemovePlayerBtn) {
+    cancelRemovePlayerBtn.addEventListener("click", closeRemoveModal);
+  }
+  if (confirmRemovePlayerBtn) {
+    confirmRemovePlayerBtn.addEventListener("click", handleConfirmRemovePlayer);
+  }
+  if (removePlayerModal) {
+    removePlayerModal.addEventListener("click", (e) => {
+      if (e.target === removePlayerModal) closeRemoveModal();
+    });
+  }
 }
 
 // Helpers
@@ -1098,7 +1122,7 @@ function renderConfirmedRoster(sess) {
           <button class="btn-row-venmo" onclick="openVenmoPaymentModal('${escapeHtml(player.player_name)}', ${player.id}, ${isPaid})">
             Venmo
           </button>
-          <button class="btn-row-delete" onclick="confirmDeleteSignup(${player.id}, '${escapeHtml(player.player_name)}')" title="Remove player">
+          <button type="button" class="btn-row-delete" onclick="openRemovePlayerModal(${player.id}, '${escapeHtml(player.player_name).replace(/'/g, "\\'")}')" title="Remove player" aria-label="Remove ${escapeHtml(player.player_name)}">
             &times;
           </button>
         </div>
@@ -1148,7 +1172,7 @@ function renderWaitlist(sess) {
         <button class="btn-row-venmo" onclick="openVenmoPaymentModal('${escapeHtml(p.player_name)}', ${p.id}, ${isPaid})">
           Venmo
         </button>
-        <button class="btn-row-delete" onclick="confirmDeleteSignup(${p.id}, '${escapeHtml(p.player_name)}')" title="Remove from waitlist">
+        <button type="button" class="btn-row-delete" onclick="openRemovePlayerModal(${p.id}, '${escapeHtml(p.player_name).replace(/'/g, "\\'")}')" title="Remove from waitlist" aria-label="Remove ${escapeHtml(p.player_name)}">
           &times;
         </button>
       </div>
@@ -1231,20 +1255,45 @@ async function handleSignup(e) {
   }
 }
 
-// Delete Signup
-async function confirmDeleteSignup(signupId, playerName) {
-  if (!confirm(`Are you sure you want to remove ${playerName} from this session?`)) {
-    return;
+// Remove Player In-App Modal Handlers (Android & Mobile Safe - Replaces window.confirm)
+function openRemovePlayerModal(signupId, playerName) {
+  pendingDeleteSignupId = signupId;
+  pendingDeletePlayerName = playerName;
+  if (removePlayerNameText) {
+    removePlayerNameText.textContent = playerName;
   }
+  if (removePlayerModal) {
+    openModal(removePlayerModal);
+  }
+}
+
+function closeRemoveModal() {
+  pendingDeleteSignupId = null;
+  pendingDeletePlayerName = "";
+  if (removePlayerModal) {
+    closeModal(removePlayerModal);
+  }
+}
+
+async function handleConfirmRemovePlayer() {
+  if (!pendingDeleteSignupId) return;
+  const signupId = pendingDeleteSignupId;
+  const playerName = pendingDeletePlayerName;
+  closeRemoveModal();
 
   try {
     await DataManager.deleteSignup(signupId);
     showToast(`${playerName} removed`);
     await loadSessions();
   } catch (err) {
-    console.error(err);
+    console.error("Error removing player:", err);
     showToast("Error removing player");
   }
+}
+
+// Backward-compatible alias that safely opens the in-app modal
+function confirmDeleteSignup(signupId, playerName) {
+  openRemovePlayerModal(signupId, playerName);
 }
 
 // Venmo Modal & QR Code
