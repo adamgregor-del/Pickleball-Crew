@@ -182,7 +182,6 @@ body {
     0 20px 35px -15px rgba(0, 0, 0, 0.55),
     0 0 0 1px rgba(255, 255, 255, 0.18),
     0 1px 0 rgba(255, 255, 255, 0.95) inset;
-  transform: translateZ(0);
 }
 
 /* Compact Hero Header */
@@ -1199,8 +1198,6 @@ body {
   font-weight: 600;
 }
 
-/* Compact Thursday Session Section (Small) */
-.compact-session-section {
 /* Session Selector with Dropdown (Replaces Date Cards) */
 .session-dropdown-section, .compact-session-section {
   background: var(--card-bg);
@@ -1313,6 +1310,212 @@ body {
 .form-select:focus {
   border-color: var(--border-focus);
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+/* Custom Accessible Dropdowns (Bulletproof across Android, iOS & Desktop) */
+.custom-select-container {
+  position: relative;
+  width: 100%;
+}
+
+.custom-select-trigger {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 14px;
+  background: #ffffff;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-main);
+  cursor: pointer;
+  text-align: left;
+  outline: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.custom-select-trigger:focus-visible,
+.custom-select-container.open .custom-select-trigger {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+}
+
+.view-confirmed-trigger {
+  background-color: #f8fafc;
+  border-radius: 10px;
+  margin-bottom: 4px;
+}
+
+.custom-select-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.custom-select-label .trigger-date-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.custom-select-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  transition: transform 0.2s ease, color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.custom-select-container.open .custom-select-arrow {
+  transform: rotate(180deg);
+  color: var(--primary);
+}
+
+.custom-select-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: #ffffff;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 
+    0 14px 32px -4px rgba(15, 23, 42, 0.18),
+    0 4px 10px rgba(0, 0, 0, 0.06);
+  max-height: 280px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 6px;
+}
+
+.custom-select-container.open .custom-select-menu {
+  display: block;
+  animation: selectMenuFadeIn 0.14s ease-out;
+}
+
+@keyframes selectMenuFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.custom-select-option {
+  padding: 10px 12px;
+  min-height: 44px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 14.5px;
+  color: #1e293b;
+  transition: background-color 0.12s ease;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.custom-select-option:hover,
+.custom-select-option:active {
+  background-color: #f1f5f9;
+}
+
+.custom-select-option.selected {
+  background-color: #ecfdf5;
+  color: #065f46;
+  font-weight: 700;
+}
+
+.custom-select-option .option-date-text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.option-check {
+  display: inline-block;
+  width: 16px;
+  font-weight: 800;
+  color: #059669;
+  flex-shrink: 0;
+}
+
+.option-check-spacer {
+  display: inline-block;
+  width: 16px;
+  flex-shrink: 0;
+}
+
+.option-spots-badge {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+.option-badge-open {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.option-badge-full {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.trigger-spots-pill {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+.trigger-spots-pill.badge-open {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.trigger-spots-pill.badge-full {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.hidden-select {
+  position: absolute !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  height: 0 !important;
+  width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
 }
 
 /* Waitlist section always visible */

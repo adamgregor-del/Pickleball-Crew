@@ -783,6 +783,7 @@ async function reloadRosterPreservingSelection() {
   try {
     state.sessions = await DataManager.getSessions();
     renderDatesCarousel();
+    renderCustomDropdowns();
     if (state.currentSessionId) {
       state.currentSession = await DataManager.getSessionById(state.currentSessionId);
       renderSessionView();
@@ -793,7 +794,9 @@ async function reloadRosterPreservingSelection() {
 }
 
 function setupEventListeners() {
-  // Select dropdown in Sign-Up Card
+  setupCustomDropdownListeners();
+
+  // Select dropdown in Sign-Up Card (fallback synchronization)
   if (signupDateSelect) {
     signupDateSelect.addEventListener("change", (e) => {
       const selectedId = parseInt(e.target.value, 10);
@@ -801,7 +804,7 @@ function setupEventListeners() {
     });
   }
 
-  // Dropdown for "View confirmed players for [date]"
+  // Dropdown for "View confirmed players for [date]" (fallback synchronization)
   if (viewConfirmedSelect) {
     viewConfirmedSelect.addEventListener("change", (e) => {
       const selectedId = parseInt(e.target.value, 10);
@@ -984,6 +987,7 @@ async function loadSessions() {
       }
 
       renderDatesCarousel();
+      renderCustomDropdowns();
 
       // Select first session if not already selected
       if (!state.currentSessionId || !state.sessions.find(s => s.id === state.currentSessionId)) {
@@ -997,6 +1001,165 @@ async function loadSessions() {
   } catch (err) {
     console.error("Error loading sessions:", err);
     if (datesCarousel) datesCarousel.innerHTML = `<div class="dates-loading">Failed to load sessions.</div>`;
+  }
+}
+
+function setupCustomDropdownListeners() {
+  const signupContainer = document.getElementById("signupDateContainer");
+  const signupTrigger = document.getElementById("signupDateTrigger");
+  const signupMenu = document.getElementById("signupDateMenu");
+
+  const viewContainer = document.getElementById("viewConfirmedContainer");
+  const viewTrigger = document.getElementById("viewConfirmedTrigger");
+  const viewMenu = document.getElementById("viewConfirmedMenu");
+
+  function closeAllDropdowns() {
+    if (signupContainer) signupContainer.classList.remove("open");
+    if (signupTrigger) signupTrigger.setAttribute("aria-expanded", "false");
+    if (viewContainer) viewContainer.classList.remove("open");
+    if (viewTrigger) viewTrigger.setAttribute("aria-expanded", "false");
+  }
+
+  // Toggle Sign-Up dropdown
+  if (signupTrigger && signupContainer) {
+    signupTrigger.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const wasOpen = signupContainer.classList.contains("open");
+      closeAllDropdowns();
+      if (!wasOpen) {
+        signupContainer.classList.add("open");
+        signupTrigger.setAttribute("aria-expanded", "true");
+      }
+    });
+  }
+
+  // Toggle View Confirmed dropdown
+  if (viewTrigger && viewContainer) {
+    viewTrigger.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const wasOpen = viewContainer.classList.contains("open");
+      closeAllDropdowns();
+      if (!wasOpen) {
+        viewContainer.classList.add("open");
+        viewTrigger.setAttribute("aria-expanded", "true");
+      }
+    });
+  }
+
+  // Option selection in Sign-Up dropdown
+  if (signupMenu) {
+    signupMenu.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const option = e.target.closest(".custom-select-option");
+      if (option && option.dataset.sessionId) {
+        const id = parseInt(option.dataset.sessionId, 10);
+        if (id) {
+          selectSession(id);
+          closeAllDropdowns();
+        }
+      }
+    });
+  }
+
+  // Option selection in View Confirmed dropdown
+  if (viewMenu) {
+    viewMenu.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const option = e.target.closest(".custom-select-option");
+      if (option && option.dataset.sessionId) {
+        const id = parseInt(option.dataset.sessionId, 10);
+        if (id) {
+          selectSession(id);
+          closeAllDropdowns();
+        }
+      }
+    });
+  }
+
+  // Close when tapping outside
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".custom-select-container")) {
+      closeAllDropdowns();
+    }
+  });
+
+  // Close on Escape key
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeAllDropdowns();
+    }
+  });
+}
+
+function renderCustomDropdowns() {
+  if (!state.sessions || state.sessions.length === 0) return;
+
+  const currentId = state.currentSessionId || state.sessions[0].id;
+  const current = state.sessions.find(s => s.id === currentId) || state.sessions[0];
+
+  // 1. Sign-Up Card custom dropdown
+  const signupMenu = document.getElementById("signupDateMenu");
+  const signupTriggerLabel = document.getElementById("signupDateTriggerLabel");
+
+  if (signupMenu) {
+    signupMenu.innerHTML = state.sessions.map(s => {
+      const isSelected = s.id === currentId;
+      const pretty = formatDateLong(s.session_date);
+      const spotsText = s.spots_remaining > 0 ? `${s.spots_remaining} spots open` : `FULL (${s.waitlist_count} waitlist)`;
+      const badgeClass = s.spots_remaining > 0 ? "option-badge-open" : "option-badge-full";
+      return `
+        <div class="custom-select-option ${isSelected ? "selected" : ""}" data-session-id="${s.id}" role="option" aria-selected="${isSelected}">
+          <span class="option-date-text">
+            ${isSelected ? '<span class="option-check">✓</span>' : '<span class="option-check-spacer"></span>'}
+            <span>${pretty}</span>
+          </span>
+          <span class="option-spots-badge ${badgeClass}">${spotsText}</span>
+        </div>
+      `;
+    }).join("");
+  }
+
+  // 2. View Confirmed Players card custom dropdown
+  const viewMenu = document.getElementById("viewConfirmedMenu");
+  const viewTriggerLabel = document.getElementById("viewConfirmedTriggerLabel");
+
+  if (viewMenu) {
+    viewMenu.innerHTML = state.sessions.map(s => {
+      const isSelected = s.id === currentId;
+      const pretty = formatDateLong(s.session_date);
+      const spotsText = s.spots_remaining > 0 ? `${s.spots_remaining} open` : `Full (${s.waitlist_count} waitlist)`;
+      const badgeClass = s.spots_remaining > 0 ? "option-badge-open" : "option-badge-full";
+      return `
+        <div class="custom-select-option ${isSelected ? "selected" : ""}" data-session-id="${s.id}" role="option" aria-selected="${isSelected}">
+          <span class="option-date-text">
+            ${isSelected ? '<span class="option-check">✓</span>' : '<span class="option-check-spacer"></span>'}
+            <span>${pretty}</span>
+          </span>
+          <span class="option-spots-badge ${badgeClass}">${spotsText}</span>
+        </div>
+      `;
+    }).join("");
+  }
+
+  // Update Trigger Labels for active session
+  if (current) {
+    const pretty = formatDateLong(current.session_date);
+    const signupSpots = current.spots_remaining > 0 ? `${current.spots_remaining} spots open` : `FULL (${current.waitlist_count} waitlist)`;
+    const viewSpots = current.spots_remaining > 0 ? `${current.spots_remaining} open` : `Full (${current.waitlist_count} waitlist)`;
+
+    if (signupTriggerLabel) {
+      signupTriggerLabel.innerHTML = `
+        <span class="trigger-date-text">${pretty}</span>
+        <span class="trigger-spots-pill ${current.spots_remaining > 0 ? "badge-open" : "badge-full"}">${signupSpots}</span>
+      `;
+    }
+
+    if (viewTriggerLabel) {
+      viewTriggerLabel.innerHTML = `
+        <span class="trigger-date-text">${pretty}</span>
+        <span class="trigger-spots-pill ${current.spots_remaining > 0 ? "badge-open" : "badge-full"}">${viewSpots}</span>
+      `;
+    }
   }
 }
 
@@ -1046,6 +1209,7 @@ async function selectSession(sessionId) {
     viewConfirmedSelect.value = sessionId;
   }
   renderDatesCarousel();
+  renderCustomDropdowns();
 
   try {
     state.currentSession = await DataManager.getSessionById(sessionId);
@@ -1091,6 +1255,9 @@ function renderSessionView() {
   // Roster rendering
   renderConfirmedRoster(sess);
   renderWaitlist(sess);
+
+  // Sync custom dropdowns with updated counts
+  renderCustomDropdowns();
 }
 
 function renderConfirmedRoster(sess) {
