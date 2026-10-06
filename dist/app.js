@@ -182,22 +182,20 @@ const DataManager = {
     const raw = localStorage.getItem("woburn_pickleball_store_v2");
     if (raw) {
       try {
-        return JSON.parse(raw);
+        const parsed = JSON.parse(raw);
+        if (parsed && Array.isArray(parsed.sessions)) {
+          parsed.sessions = parsed.sessions.filter(s => s.session_date < "2026-10-29");
+          return parsed;
+        }
       } catch (e) {}
     }
     const initial = {
       settings: this.getDefaultSettings(),
       nextSignupId: 1,
-      nextSessionId: 9,
+      nextSessionId: 3,
       sessions: [
         { id: 1, session_date: "2026-10-15", day_of_week: "Thursday", time_slot: "7:00 PM - 9:00 PM", location: "Woburn Racket Club, 9 Webster St, Woburn, MA 01801", courts: 2, cost_per_person: 23, max_players: 8, notes: "Week 1 of 8 • 2 Courts reserved for doubles play!" },
-        { id: 2, session_date: "2026-10-22", day_of_week: "Thursday", time_slot: "7:00 PM - 9:00 PM", location: "Woburn Racket Club, 9 Webster St, Woburn, MA 01801", courts: 2, cost_per_person: 23, max_players: 8, notes: "Week 2 of 8 • 2 Courts reserved for doubles play!" },
-        { id: 3, session_date: "2026-10-29", day_of_week: "Thursday", time_slot: "7:00 PM - 9:00 PM", location: "Woburn Racket Club, 9 Webster St, Woburn, MA 01801", courts: 2, cost_per_person: 23, max_players: 8, notes: "Week 3 of 8 • 2 Courts reserved for doubles play!" },
-        { id: 4, session_date: "2026-11-05", day_of_week: "Thursday", time_slot: "7:00 PM - 9:00 PM", location: "Woburn Racket Club, 9 Webster St, Woburn, MA 01801", courts: 2, cost_per_person: 23, max_players: 8, notes: "Week 4 of 8 • 2 Courts reserved for doubles play!" },
-        { id: 5, session_date: "2026-11-12", day_of_week: "Thursday", time_slot: "7:00 PM - 9:00 PM", location: "Woburn Racket Club, 9 Webster St, Woburn, MA 01801", courts: 2, cost_per_person: 23, max_players: 8, notes: "Week 5 of 8 • 2 Courts reserved for doubles play!" },
-        { id: 6, session_date: "2026-11-19", day_of_week: "Thursday", time_slot: "7:00 PM - 9:00 PM", location: "Woburn Racket Club, 9 Webster St, Woburn, MA 01801", courts: 2, cost_per_person: 23, max_players: 8, notes: "Week 6 of 8 • 2 Courts reserved for doubles play!" },
-        { id: 7, session_date: "2026-12-03", day_of_week: "Thursday", time_slot: "7:00 PM - 9:00 PM", location: "Woburn Racket Club, 9 Webster St, Woburn, MA 01801", courts: 2, cost_per_person: 23, max_players: 8, notes: "Week 7 of 8 • 2 Courts reserved for doubles play!" },
-        { id: 8, session_date: "2026-12-10", day_of_week: "Thursday", time_slot: "7:00 PM - 9:00 PM", location: "Woburn Racket Club, 9 Webster St, Woburn, MA 01801", courts: 2, cost_per_person: 23, max_players: 8, notes: "Week 8 of 8 • 2 Courts reserved for doubles play!" }
+        { id: 2, session_date: "2026-10-22", day_of_week: "Thursday", time_slot: "7:00 PM - 9:00 PM", location: "Woburn Racket Club, 9 Webster St, Woburn, MA 01801", courts: 2, cost_per_person: 23, max_players: 8, notes: "Week 2 of 8 • 2 Courts reserved for doubles play!" }
       ],
       signups: []
     };
@@ -300,8 +298,9 @@ const DataManager = {
           .order("created_at", { ascending: true });
 
         if (!sessErr && sessions) {
+          const validSessions = sessions.filter(s => s.session_date < "2026-10-29");
           const allSignups = signups || [];
-          return sessions.map(s => {
+          return validSessions.map(s => {
             const sSignups = allSignups.filter(su => String(su.session_id) === String(s.id));
             const paidCount = sSignups.filter(su => Number(su.paid) === 1).length;
             const total = sSignups.length;
@@ -327,11 +326,15 @@ const DataManager = {
     if (await this.checkBackend()) {
       try {
         const res = await fetch("/api/sessions");
-        if (res.ok) return await res.json();
+        if (res.ok) {
+          const json = await res.json();
+          return (json || []).filter(s => s.session_date < "2026-10-29");
+        }
       } catch (e) {}
     }
     const data = await this.getData();
-    return data.sessions.map(s => {
+    const validSessions = (data.sessions || []).filter(s => s.session_date < "2026-10-29");
+    return validSessions.map(s => {
       const sSignups = data.signups.filter(su => su.session_id === s.id);
       const paidCount = sSignups.filter(su => su.paid === 1).length;
       const total = sSignups.length;
@@ -1000,7 +1003,8 @@ function updateSettingsUI() {
 
 async function loadSessions() {
   try {
-    state.sessions = await DataManager.getSessions();
+    const rawSessions = await DataManager.getSessions();
+    state.sessions = (rawSessions || []).filter(s => s.session_date < "2026-10-29");
 
     if (state.sessions && state.sessions.length > 0) {
       // Populate select dropdown in Sign-Up card
